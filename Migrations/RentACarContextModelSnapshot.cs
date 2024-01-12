@@ -44,6 +44,9 @@ namespace RentACar.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(6,2)");
 
+                    b.Property<int?>("RentalID")
+                        .HasColumnType("int");
+
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
@@ -94,6 +97,35 @@ namespace RentACar.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("RentACar.Models.Client", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+
+                    b.Property<string>("Adress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Client");
+                });
+
             modelBuilder.Entity("RentACar.Models.Company", b =>
                 {
                     b.Property<int>("ID")
@@ -117,6 +149,34 @@ namespace RentACar.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Company");
+                });
+
+            modelBuilder.Entity("RentACar.Models.Rental", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"), 1L, 1);
+
+                    b.Property<int?>("CarID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClientID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CarID")
+                        .IsUnique()
+                        .HasFilter("[CarID] IS NOT NULL");
+
+                    b.HasIndex("ClientID");
+
+                    b.ToTable("Rentals");
                 });
 
             modelBuilder.Entity("RentACar.Models.Car", b =>
@@ -147,14 +207,36 @@ namespace RentACar.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("RentACar.Models.Rental", b =>
+                {
+                    b.HasOne("RentACar.Models.Car", "Car")
+                        .WithOne("Rental")
+                        .HasForeignKey("RentACar.Models.Rental", "CarID");
+
+                    b.HasOne("RentACar.Models.Client", "Client")
+                        .WithMany("Rentals")
+                        .HasForeignKey("ClientID");
+
+                    b.Navigation("Car");
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("RentACar.Models.Car", b =>
                 {
                     b.Navigation("CarCategories");
+
+                    b.Navigation("Rental");
                 });
 
             modelBuilder.Entity("RentACar.Models.Category", b =>
                 {
                     b.Navigation("CarCategories");
+                });
+
+            modelBuilder.Entity("RentACar.Models.Client", b =>
+                {
+                    b.Navigation("Rentals");
                 });
 
             modelBuilder.Entity("RentACar.Models.Company", b =>

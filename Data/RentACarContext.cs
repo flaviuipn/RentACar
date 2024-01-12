@@ -20,6 +20,14 @@ namespace RentACar.Data
 
         public DbSet<RentACar.Models.Category>? Category { get; set; }
 
-        
+        public DbSet<Rental> Rentals { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Car>()
+                .HasOne(c => c.Rental)
+                .WithOne(r => r.Car)
+                .HasForeignKey<Rental>(r => r.CarID);
+        }
+        public DbSet<RentACar.Models.Client>? Client { get; set; }
     }
 }
