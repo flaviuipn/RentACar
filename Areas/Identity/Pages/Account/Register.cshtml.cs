@@ -5,11 +5,13 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using RentACar.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +20,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using RentACar.Models;
 
 namespace RentACar.Areas.Identity.Pages.Account
 {
@@ -30,7 +31,9 @@ namespace RentACar.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+
         private readonly RentACar.Data.RentACarContext _context;
+
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
@@ -52,7 +55,6 @@ namespace RentACar.Areas.Identity.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        /// 
         [BindProperty]
         public Client Client { get; set; }
 
@@ -112,10 +114,9 @@ namespace RentACar.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
-
+        
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await
            _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -133,7 +134,7 @@ namespace RentACar.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
-               
+
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await
                _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -151,11 +152,11 @@ namespace RentACar.Areas.Identity.Pages.Account
                },
                 protocol: Request.Scheme);
                 await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-               
-                $"Please confirm your account by <a href = '{HtmlEncoder.Default.Encode(callbackUrl)}' > clicking here </ a >.");
-           
 
-            if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                $"Please confirm your account by <a href = '{HtmlEncoder.Default.Encode(callbackUrl)}' > clicking here </ a >.");
+
+
+                if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 {
                     return RedirectToPage("RegisterConfirmation", new
                     {

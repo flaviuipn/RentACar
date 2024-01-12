@@ -10,6 +10,7 @@ using RentACar.Models;
 
 namespace RentACar.Pages.Cars
 {
+
     public class DetailsModel : PageModel
     {
         private readonly RentACar.Data.RentACarContext _context;
